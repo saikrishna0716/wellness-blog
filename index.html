@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health & Wellness Articles</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .search-bar {
+            width: 100%;
+            max-width: 600px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 25px;
+            outline: none;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 2rem auto;
+            gap: 2rem;
+            padding: 0 2rem;
+        }
+
+        .sidebar {
+            flex: 0 0 280px;
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .sidebar h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .filter-section {
+            margin-bottom: 2rem;
+        }
+
+        .filter-section h4 {
+            color: #555;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+        }
+
+        .filter-option input[type="checkbox"] {
+            margin-right: 0.5rem;
+            cursor: pointer;
+        }
+
+        .filter-option label {
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .content {
+            flex: 1;
+        }
+
+        .articles-grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .article-card {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .article-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .article-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .article-title {
+            color: #2c3e50;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .article-meta {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .article-excerpt {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .tag {
+            background: #e8f4f8;
+            color: #2980b9;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .read-more {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .read-more:hover {
+            color: #764ba2;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        .clear-filters {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            width: 100%;
+            margin-top: 1rem;
+            transition: background 0.2s;
+        }
+
+        .clear-filters:hover {
+            background: #764ba2;
+        }
+
+        @media (max-width: 968px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                flex: 1;
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Health & Wellness Articles</h1>
+        <input type="text" class="search-bar" id="searchBar" placeholder="Search articles by keyword...">
+    </div>
+
+    <div class="container">
+        <aside class="sidebar">
+            <h3>Filter Articles</h3>
+            
+            <div class="filter-section">
+                <h4>Nutrition</h4>
+                <div class="filter-option">
+                    <input type="checkbox" id="diet" value="diet" class="filter-checkbox">
+                    <label for="diet">Diet & Meal Planning</label>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="supplements" value="supplements" class="filter-checkbox">
+                    <label for="supplements">Supplements</label>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="hydration" value="hydration" class="filter-checkbox">
+                    <label for="hydration">Hydration</label>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h4>Fitness</h4>
+                <div class="filter-option">
+                    <input type="checkbox" id="cardio" value="cardio" class="filter-checkbox">
+                    <label for="cardio">Cardio</label>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="strength" value="strength" class="filter-checkbox">
+                    <label for="strength">Strength Training</label>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="flexibility" value="flexibility" class="filter-checkbox">
+                    <label for="flexibility">Flexibility & Yoga</label>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h4>Mental Health</h4>
+                <div class="filter-option">
+                    <input type="checkbox" id="stress" value="stress" class="filter-checkbox">
+                    <label for="stress">Stress Management</label>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="mindfulness" value="mindfulness" class="filter-checkbox">
+                    <label for="mindfulness">Mindfulness</label>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="sleep" value="sleep" class="filter-checkbox">
+                    <label for="sleep">Sleep Health</label>
+                </div>
+            </div>
+
+            <button class="clear-filters" id="clearFilters">Clear All Filters</button>
+        </aside>
+
+        <main class="content">
+            <div class="articles-grid" id="articlesGrid">
+                <!-- Articles will be dynamically inserted here -->
+            </div>
+            <div class="no-results" id="noResults" style="display: none;">
+                No articles found matching your criteria.
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Sample articles data
+        const articles = [
+            {
+                id: 1,
+                title: "The Power of Morning Routines: How to Start Your Day Right",
+                author: "Dr. Sarah Chen",
+                date: "October 28, 2025",
+                excerpt: "Establishing a consistent morning routine can dramatically improve your mental clarity, productivity, and overall well-being. Research shows that people who maintain structured morning habits report 40% less stress throughout their day. Learn how to create a morning routine that works for your lifestyle, incorporating elements like hydration, light exercise, and mindful meditation to set a positive tone for the hours ahead.",
+                tags: ["mindfulness", "stress", "hydration"],
+                categories: ["mental-health", "wellness"]
+            },
+            {
+                id: 2,
+                title: "Building Strength Without the Gym: Effective Bodyweight Exercises",
+                author: "Marcus Johnson",
+                date: "October 25, 2025",
+                excerpt: "You don't need expensive equipment or a gym membership to build serious strength. Bodyweight exercises like push-ups, squats, planks, and lunges can provide a comprehensive full-body workout that builds muscle, improves endurance, and enhances functional fitness. This guide breaks down proper form, progressive overload techniques, and how to structure a weekly routine that delivers real results from the comfort of your home.",
+                tags: ["strength", "fitness", "home-workout"],
+                categories: ["fitness", "strength-training"]
+            },
+            {
+                id: 3,
+                title: "Sleep Hygiene 101: Science-Backed Tips for Better Rest",
+                author: "Dr. Emily Thompson",
+                date: "October 22, 2025",
+                excerpt: "Quality sleep is foundational to good health, yet millions struggle with insomnia and poor sleep quality. Understanding sleep hygiene—the habits and environmental factors that promote consistent, restful sleep—can be transformative. From optimizing your bedroom temperature and lighting to establishing a wind-down routine and managing screen time, these evidence-based strategies will help you achieve the restorative sleep your body needs to function at its best.",
+                tags: ["sleep", "wellness", "stress"],
+                categories: ["mental-health", "sleep-health"]
+            }
+        ];
+
+        let filteredArticles = [...articles];
+
+        // Render articles
+        function renderArticles(articlesToRender) {
+            const grid = document.getElementById('articlesGrid');
+            const noResults = document.getElementById('noResults');
+            
+            grid.innerHTML = '';
+            
+            if (articlesToRender.length === 0) {
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            
+            articlesToRender.forEach(article => {
+                const articleCard = document.createElement('div');
+                articleCard.className = 'article-card';
+                articleCard.innerHTML = `
+                    <div class="article-header">
+                        <div>
+                            <h2 class="article-title">${article.title}</h2>
+                            <div class="article-meta">By ${article.author} • ${article.date}</div>
+                        </div>
+                    </div>
+                    <p class="article-excerpt">${article.excerpt}</p>
+                    <div class="tags">
+                        ${article.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <a href="#" class="read-more">Read More →</a>
+                    </div>
+                `;
+                grid.appendChild(articleCard);
+            });
+        }
+
+        // Filter articles
+        function filterArticles() {
+            const searchTerm = document.getElementById('searchBar').value.toLowerCase();
+            const selectedFilters = Array.from(document.querySelectorAll('.filter-checkbox:checked'))
+                .map(cb => cb.value);
+            
+            filteredArticles = articles.filter(article => {
+                // Search filter
+                const matchesSearch = searchTerm === '' || 
+                    article.title.toLowerCase().includes(searchTerm) ||
+                    article.excerpt.toLowerCase().includes(searchTerm) ||
+                    article.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+                
+                // Category filter
+                const matchesFilters = selectedFilters.length === 0 ||
+                    selectedFilters.some(filter => article.tags.includes(filter));
+                
+                return matchesSearch && matchesFilters;
+            });
+            
+            renderArticles(filteredArticles);
+        }
+
+        // Event listeners
+        document.getElementById('searchBar').addEventListener('input', filterArticles);
+        
+        document.querySelectorAll('.filter-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', filterArticles);
+        });
+        
+        document.getElementById('clearFilters').addEventListener('click', () => {
+            document.querySelectorAll('.filter-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('searchBar').value = '';
+            filterArticles();
+        });
+
+        // Initial render
+        renderArticles(articles);
+    </script>
+</body>
+</html>
