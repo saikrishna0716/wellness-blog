@@ -143,6 +143,24 @@
             color: #555;
             line-height: 1.6;
             margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: all 0.3s ease;
+        }
+
+        .article-excerpt.expanded {
+            -webkit-line-clamp: unset;
+            display: block;
+        }
+
+        .article-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            align-items: center;
         }
 
         .tags {
@@ -166,10 +184,33 @@
             text-decoration: none;
             font-weight: 600;
             transition: color 0.2s;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 1rem;
         }
 
         .read-more:hover {
             color: #764ba2;
+        }
+
+        .view-full-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .view-full-btn:hover {
+            background: #764ba2;
         }
 
         .no-results {
@@ -436,16 +477,154 @@
                             <div class="article-meta">By ${article.author} • ${article.date}</div>
                         </div>
                     </div>
-                    <p class="article-excerpt">${article.excerpt}</p>
+                    <p class="article-excerpt" data-article-id="${article.id}">${article.excerpt}</p>
                     <div class="tags">
                         ${article.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
                     </div>
-                    <div style="margin-top: 1rem;">
-                        <a href="#" class="read-more">Read More →</a>
+                    <div class="article-actions">
+                        <button class="read-more" data-article-id="${article.id}">Read More →</button>
+                        <button class="view-full-btn" data-article-id="${article.id}">View Full Article</button>
                     </div>
                 `;
                 grid.appendChild(articleCard);
             });
+
+            // Add event listeners for Read More buttons
+            document.querySelectorAll('.read-more').forEach(btn => {
+                btn.addEventListener('click', toggleReadMore);
+            });
+
+            // Add event listeners for View Full Article buttons
+            document.querySelectorAll('.view-full-btn').forEach(btn => {
+                btn.addEventListener('click', openFullArticle);
+            });
+        }
+
+        // Toggle Read More/Less
+        function toggleReadMore(e) {
+            const articleId = e.target.getAttribute('data-article-id');
+            const excerpt = document.querySelector(`.article-excerpt[data-article-id="${articleId}"]`);
+            const button = e.target;
+
+            if (excerpt.classList.contains('expanded')) {
+                excerpt.classList.remove('expanded');
+                button.textContent = 'Read More →';
+            } else {
+                excerpt.classList.add('expanded');
+                button.textContent = 'Read Less ↑';
+            }
+        }
+
+        // Open full article in new window
+        function openFullArticle(e) {
+            const articleId = e.target.getAttribute('data-article-id');
+            const article = articles.find(a => a.id == articleId);
+            
+            if (!article) return;
+
+            const fullArticleHTML = `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>${article.title}</title>
+                    <style>
+                        * {
+                            margin: 0;
+                            padding: 0;
+                            box-sizing: border-box;
+                        }
+                        body {
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                            background-color: #f5f7fa;
+                            color: #333;
+                            line-height: 1.8;
+                        }
+                        .container {
+                            max-width: 800px;
+                            margin: 2rem auto;
+                            background: white;
+                            padding: 3rem;
+                            border-radius: 10px;
+                            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                        }
+                        .header {
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            color: white;
+                            padding: 2rem;
+                            margin: -3rem -3rem 2rem -3rem;
+                            border-radius: 10px 10px 0 0;
+                        }
+                        h1 {
+                            font-size: 2rem;
+                            margin-bottom: 1rem;
+                        }
+                        .meta {
+                            color: rgba(255,255,255,0.9);
+                            font-size: 0.95rem;
+                        }
+                        .content {
+                            font-size: 1.1rem;
+                            color: #444;
+                            margin: 2rem 0;
+                        }
+                        .tags {
+                            display: flex;
+                            flex-wrap: wrap;
+                            gap: 0.5rem;
+                            margin-top: 2rem;
+                            padding-top: 2rem;
+                            border-top: 1px solid #e0e0e0;
+                        }
+                        .tag {
+                            background: #e8f4f8;
+                            color: #2980b9;
+                            padding: 0.4rem 0.8rem;
+                            border-radius: 20px;
+                            font-size: 0.85rem;
+                            font-weight: 500;
+                        }
+                        .close-btn {
+                            background: #667eea;
+                            color: white;
+                            border: none;
+                            padding: 0.75rem 1.5rem;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            font-size: 1rem;
+                            margin-top: 2rem;
+                            transition: background 0.2s;
+                        }
+                        .close-btn:hover {
+                            background: #764ba2;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>${article.title}</h1>
+                            <div class="meta">By ${article.author} • ${article.date}</div>
+                        </div>
+                        <div class="content">
+                            <p>${article.excerpt}</p>
+                            <p style="margin-top: 1.5rem; font-style: italic; color: #666;">
+                                [Full article content would appear here. This is currently showing the excerpt from the CSV file.]
+                            </p>
+                        </div>
+                        <div class="tags">
+                            ${article.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                        <button class="close-btn" onclick="window.close()">Close Window</button>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            const newWindow = window.open('', '_blank', 'width=900,height=700');
+            newWindow.document.write(fullArticleHTML);
+            newWindow.document.close();
         }
 
         // Filter articles
