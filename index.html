@@ -227,60 +227,8 @@
         <aside class="sidebar">
             <h3>Filter Articles</h3>
             
-            <div class="filter-section">
-                <h4>Nutrition</h4>
-                <div class="filter-option">
-                    <input type="checkbox" id="diet" value="diet" class="filter-checkbox">
-                    <label for="diet">Diet & Meal Planning</label>
-                </div>
-                <div class="filter-option">
-                    <input type="checkbox" id="supplements" value="supplements" class="filter-checkbox">
-                    <label for="supplements">Supplements</label>
-                </div>
-                <div class="filter-option">
-                    <input type="checkbox" id="hydration" value="hydration" class="filter-checkbox">
-                    <label for="hydration">Hydration</label>
-                </div>
-                <div class="filter-option">
-                    <input type="checkbox" id="nutrition" value="nutrition" class="filter-checkbox">
-                    <label for="nutrition">General Nutrition</label>
-                </div>
-            </div>
-
-            <div class="filter-section">
-                <h4>Fitness</h4>
-                <div class="filter-option">
-                    <input type="checkbox" id="cardio" value="cardio" class="filter-checkbox">
-                    <label for="cardio">Cardio</label>
-                </div>
-                <div class="filter-option">
-                    <input type="checkbox" id="strength" value="strength" class="filter-checkbox">
-                    <label for="strength">Strength Training</label>
-                </div>
-                <div class="filter-option">
-                    <input type="checkbox" id="flexibility" value="flexibility" class="filter-checkbox">
-                    <label for="flexibility">Flexibility & Yoga</label>
-                </div>
-                <div class="filter-option">
-                    <input type="checkbox" id="fitness" value="fitness" class="filter-checkbox">
-                    <label for="fitness">General Fitness</label>
-                </div>
-            </div>
-
-            <div class="filter-section">
-                <h4>Mental Health</h4>
-                <div class="filter-option">
-                    <input type="checkbox" id="stress" value="stress" class="filter-checkbox">
-                    <label for="stress">Stress Management</label>
-                </div>
-                <div class="filter-option">
-                    <input type="checkbox" id="mindfulness" value="mindfulness" class="filter-checkbox">
-                    <label for="mindfulness">Mindfulness</label>
-                </div>
-                <div class="filter-option">
-                    <input type="checkbox" id="sleep" value="sleep" class="filter-checkbox">
-                    <label for="sleep">Sleep Health</label>
-                </div>
+            <div id="filtersContainer">
+                <!-- Filters will be dynamically loaded here -->
             </div>
 
             <button class="clear-filters" id="clearFilters">Clear All Filters</button>
@@ -300,6 +248,7 @@
     <script>
         let articles = [];
         let filteredArticles = [];
+        let filterCategories = [];
 
         // Parse CSV data
         function parseCSV(csvText) {
@@ -352,6 +301,85 @@
             }
 
             return result;
+        }
+
+        // Load filter categories from CSV
+        async function loadFilters() {
+            try {
+                const response = await fetch('filters.csv');
+                
+                if (!response.ok) {
+                    throw new Error('Could not load filters.csv');
+                }
+                
+                const csvText = await response.text();
+                filterCategories = parseCSV(csvText);
+                
+                renderFilters();
+            } catch (error) {
+                console.error('Error loading filters:', error);
+                document.getElementById('filtersContainer').innerHTML = `
+                    <div style="color: #c33; padding: 1rem; font-size: 0.9rem;">
+                        Could not load filters. Using default view.
+                    </div>
+                `;
+            }
+        }
+
+        // Render filters dynamically
+        function renderFilters() {
+            const container = document.getElementById('filtersContainer');
+            container.innerHTML = '';
+
+            // Group filters by category
+            const grouped = {};
+            filterCategories.forEach(filter => {
+                if (!grouped[filter.category]) {
+                    grouped[filter.category] = [];
+                }
+                grouped[filter.category].push(filter);
+            });
+
+            // Create HTML for each category
+            Object.keys(grouped).forEach(category => {
+                const section = document.createElement('div');
+                section.className = 'filter-section';
+                
+                const header = document.createElement('h4');
+                header.textContent = category;
+                section.appendChild(header);
+
+                grouped[category].forEach(filter => {
+                    const option = document.createElement('div');
+                    option.className = 'filter-option';
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = filter.value;
+                    checkbox.value = filter.value;
+                    checkbox.className = 'filter-checkbox';
+                    
+                    const label = document.createElement('label');
+                    label.htmlFor = filter.value;
+                    label.textContent = filter.label;
+                    
+                    option.appendChild(checkbox);
+                    option.appendChild(label);
+                    section.appendChild(option);
+                });
+
+                container.appendChild(section);
+            });
+
+            // Setup event listeners after filters are rendered
+            setupFilterListeners();
+        }
+
+        // Setup filter event listeners
+        function setupFilterListeners() {
+            document.querySelectorAll('.filter-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', filterArticles);
+            });
         }
 
         // Load CSV file
@@ -448,10 +476,6 @@
         function setupEventListeners() {
             document.getElementById('searchBar').addEventListener('input', filterArticles);
             
-            document.querySelectorAll('.filter-checkbox').forEach(checkbox => {
-                checkbox.addEventListener('change', filterArticles);
-            });
-            
             document.getElementById('clearFilters').addEventListener('click', () => {
                 document.querySelectorAll('.filter-checkbox').forEach(cb => cb.checked = false);
                 document.getElementById('searchBar').value = '';
@@ -459,8 +483,11 @@
             });
         }
 
-        // Load articles when page loads
-        window.addEventListener('DOMContentLoaded', loadArticles);
+        // Load articles and filters when page loads
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadFilters();
+            await loadArticles();
+        });
     </script>
 </body>
 </html>
