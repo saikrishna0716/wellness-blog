@@ -522,6 +522,13 @@
             
             if (!article) return;
 
+            // Check if this is the cholesterol article (has dedicated HTML file)
+            if (article.title.includes('Understanding Cholesterol')) {
+                window.open('cholesterol-article.html', '_blank', 'width=900,height=700');
+                return;
+            }
+
+            // For other articles, generate a simple full article view
             const fullArticleHTML = `
                 <!DOCTYPE html>
                 <html lang="en">
